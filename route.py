@@ -20,7 +20,17 @@ def create_sensor_data(ldrLingkungan, ldrLampu, suhu, cuaca):
 
 @router.get("/data")
 async def get_data():
-    data = connection.db.sensor.find({},{'_id': 0}).sort({"time": -1}).limit(1)
+    data = connection.db.sensor.find({},{'_id': 0})
+    return json.loads(json_util.dumps(data))
+
+@router.get("/latest-data")
+async def get_latest_data():
+    data = connection.db.sensor.find({},{'_id': 0}).sort('time', -1).limit(1)
+    return json.loads(json_util.dumps(data))
+
+@router.get("/10-data")
+async def get_10_data():
+    data = connection.db.sensor.find({},{'_id': 0}).sort('time', -1).limit(10)
     return json.loads(json_util.dumps(data))
 
 @router.post("/data")
