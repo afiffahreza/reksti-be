@@ -8,25 +8,25 @@ from datetime import datetime
 
 router = APIRouter()
 
-def create_sensor_data(ldrLingkungan, ldrLampu, suhu, humidity):
+def create_sensor_data(ldrLingkungan, ldrLampu, suhu, cuaca):
     data = schema.DataModel()
     data.data_id = ObjectId()
     data.ldrLingkungan = ldrLingkungan
     data.ldrLampu = ldrLampu
     data.suhu = suhu
-    data.humidity = humidity
+    data.cuaca = cuaca
     data.time = datetime.now()
     return dict(data)
 
 @router.get("/data")
 async def get_data():
-    data = connection.db.sensor.find({},{'_id': 0})
+    data = connection.db.sensor.find({},{'_id': 0}).sort({"time": -1}).limit(1)
     return json.loads(json_util.dumps(data))
 
 @router.post("/data")
 async def post_data(add_data: schema.DataCreate):
     new_data = add_data.dict()
-    sensor_data = create_sensor_data(new_data['ldrLingkungan'], new_data['ldrLampu'], new_data['suhu'], new_data['humidity'])
+    sensor_data = create_sensor_data(new_data['ldrLingkungan'], new_data['ldrLampu'], new_data['suhu'], new_data['cuaca'])
     connection.db.sensor.insert_one(sensor_data)
     return {'message': 'success'}
 
